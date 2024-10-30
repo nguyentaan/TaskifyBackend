@@ -24,10 +24,12 @@ namespace TaskManagementAPI.Controllers
             var user = new User { UserName = dto.Username, Email = dto.Email };
             var result = await _userManager.CreateAsync(user, dto.Password);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
-                return BadRequest(result.Errors);
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return BadRequest(new { Errors = errors }); // Return a clearer error message
             }
+
             return Ok();
         }
         [HttpPost("login")]
