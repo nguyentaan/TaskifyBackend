@@ -76,6 +76,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowAll");
 
+app.MapGet("/", () => "API of Taskify");
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
