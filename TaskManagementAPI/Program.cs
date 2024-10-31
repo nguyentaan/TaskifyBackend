@@ -13,8 +13,10 @@ var jwtsettings = builder.Configuration.GetSection("Jwt");
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<JwtServices>();
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -60,7 +62,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddScoped<JwtServices>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
