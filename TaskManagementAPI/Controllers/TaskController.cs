@@ -39,13 +39,14 @@ namespace TaskManagementAPI.Controllers
         }
 
         [HttpPut("{taskId}/status")]
-        public async Task<IActionResult> UpdateTaskStatus(int taskId, [FromBody] bool isCompleted)
+        public async Task<IActionResult> UpdateTaskStatus(int taskId, [FromBody] TaskStatusUpdateDto statusUpdate)
         {
-            var updatedTask = await _taskService.UpdateTaskStatusAsync(taskId, isCompleted);
+            var updatedTask = await _taskService.UpdateTaskStatusAsync(taskId, statusUpdate.IsCompleted);
             if (updatedTask == null) return NotFound(new { message = "Task not found" });
 
             return Ok(new { message = "Task status updated successfully", task = updatedTask });
         }
+
 
         [HttpDelete("delete/{taskId}")]
         public async Task<IActionResult> DeleteTaskById(int taskId)
