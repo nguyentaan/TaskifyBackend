@@ -7,17 +7,27 @@ namespace TaskManagementAPI.Data
     public class ApplicationDbContext : IdentityDbContext<User>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+
         public DbSet<Models.Task> Tasks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<User>().Property(u => u.Initials).HasMaxLength(5);
+
+            // Configure User entity
+            builder.Entity<User>()
+                .Property(u => u.Initials)
+                .HasMaxLength(5);
+
+            // Configure default schema for Identity
             builder.HasDefaultSchema("identity");
+
+            // Configure the Task entity to User relationship
             builder.Entity<Models.Task>()
                 .HasOne(t => t.User)
-                .WithMany()
+                .WithMany(u => u.Tasks) // Ensure the navigation property is specified
                 .HasForeignKey(t => t.UserId)
-                .HasPrincipalKey(u => u.Id);
+                .OnDelete(DeleteBehavior.Cascade); // Optional: specify delete behavior
         }
     }
 }

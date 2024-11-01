@@ -38,23 +38,26 @@ namespace TaskManagementAPI.Services
                 UserId = task.UserId
             };
         }
-        public async Task<IEnumerable<TaskDto>> GetTasksByUserIdAsync(string userId)
+        public async Task<IEnumerable<GetTaskDto>> GetTasksByUserIdAsync(string userId)
         {
             var tasks = await _context.Tasks
                 .Where(t => t.UserId == userId)
-                .Select(t => new TaskDto
+                .Select(t => new GetTaskDto
                 {
                     Id = t.Id,
                     Title = t.Title,
                     Description = t.Description,
                     IsCompleted = t.IsCompleted,
                     DueDate = t.DueDate,
-                    UserId = t.UserId
+                    UserId = t.UserId,
+                    // If you need to include user-related data, do it directly here if it's part of GetTaskDto
+                    Email = t.User.Email // Example if you need to get the user's name
                 })
                 .ToListAsync();
 
             return tasks;
         }
+
         public async Task<TaskDto?> UpdateTaskAsync(int taskId, UpdateTaskDto updateTaskDto)
         {
             var task = await _context.Tasks.FindAsync(taskId);

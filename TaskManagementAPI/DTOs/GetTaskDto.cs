@@ -1,7 +1,8 @@
-﻿
+﻿using TaskManagementAPI.Models;
+
 namespace TaskManagementAPI.DTOs
 {
-    public class TaskDto
+    public class GetTaskDto
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -9,5 +10,6 @@ namespace TaskManagementAPI.DTOs
         public bool IsCompleted { get; set; }
         public DateTime DueDate { get; set; }
         public string UserId { get; set; }
+        public string Email{ get; set; }
     }
 }
