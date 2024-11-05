@@ -21,7 +21,7 @@ namespace TaskManagementAPI.Services
             while (!stoppingToken.IsCancellationRequested)
             {
                 await CheckForUpComingTasks();
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                await Task.Delay(TimeSpan.FromHours(24), stoppingToken); // Adjust as needed
             }
         }
 
@@ -31,24 +31,19 @@ namespace TaskManagementAPI.Services
             var applicationDbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
 
-            // Find tasks due in the next day that haven't had reminders sent
+            // Find tasks due within the next 24 hours
             var upcomingTasks = await applicationDbContext.Tasks
-                .Include(t => t.User) // Ensure that the User is included
+                .Include(t => t.User)
                 .Where(t => !t.IsCompleted && !t.ReminderSent && t.DueDate <= DateTime.Now.AddDays(1))
                 .ToListAsync();
 
 
             foreach (var task in upcomingTasks)
             {
-                if (task.User != null) // Check if User is not null
+                if (task.User != null && !string.IsNullOrEmpty(task.User.Email))
                 {
-                    string? userEmail = task.User.Email;
-
-                    if (!string.IsNullOrEmpty(userEmail)) // Check if Email is not null or empty
-                    {
-                        await emailService.SendReminderEmail(userEmail, task.Title, task.DueDate);
-                        task.ReminderSent = true;
-                    }
+                    await emailService.SendReminderEmail(task.User.Email, task.Title, task.DueDate);
+                    task.ReminderSent = true;
                 }
             }
 
