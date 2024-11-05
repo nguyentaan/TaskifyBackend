@@ -1,6 +1,6 @@
-﻿using System.Net;
-using System.Net.Mail;
+﻿using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
+using MimeKit;
 
 namespace TaskManagementAPI.Services
 {
@@ -19,17 +19,28 @@ namespace TaskManagementAPI.Services
             var fromEmail = _configuration["EmailSettings:FromEmail"];
             var appPassword = _configuration["EmailSettings:AppPassword"];
             var smtpServer = _configuration["EmailSettings:SmtpServer"];
-            var smtpPort = _configuration["EmailSettings:SmtpPort"];
+            var smtpPort = 587;
 
-            // Send email using SMTP client
-            using var client = new SmtpClient(smtpServer)
+            //create the email message
+            var email = new MimeMessage();
+            email.From.Add(new MailboxAddress("Task Reminder", fromEmail));
+            email.To.Add(MailboxAddress.Parse(toEmail));
+            email.Subject = subject;
+            email.Body = new TextPart("plain") { Text = body };
+
+            //Send the email
+            using var client = new SmtpClient();
+            try
             {
-                Credentials = new NetworkCredential(fromEmail, appPassword),
-                EnableSsl = true
-            };
+                await client.ConnectAsync(smtpServer, smtpPort, false);
+                await client.AuthenticateAsync(fromEmail, appPassword);
+                await client.SendAsync(email);
+            }
+            finally
+            {
 
-            var mailMessage = new MailMessage(fromEmail, toEmail, subject, body);
-            await client.SendMailAsync(mailMessage);
+               await client.DisconnectAsync(true);
+            }
         }
     }
 }
