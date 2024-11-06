@@ -33,6 +33,7 @@ namespace TaskManagementAPI.Controllers
 
             return Ok();
         }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
@@ -43,6 +44,42 @@ namespace TaskManagementAPI.Controllers
             var token = _jwtService.GenerateToken(user);
             return Ok(new { Token = token });
 
+        }
+
+        [HttpPost("google-signin")]
+        public async Task<IActionResult> GoogleSignIn([FromBody] GoogleSignInDto googleSignInDto)
+        {
+            try
+            {
+                // Verify the Google ID token
+                var payload = await GoogleJsonWebSignature.ValidateAsync(googleSignInDto.IdToken);
+
+                //Check if the user already exists
+                var user = await _userManager.FindByEmailAsync(payload.Email);
+                if (user == null)
+                {
+                    // Create a new user if the user does not exist
+                    user = new User
+                    {
+                        Email = payload.Email,
+                        UserName = payload.Name
+                    };
+                    var result = await _userManager.CreateAsync(user);
+                    if (!result.Succeeded)
+                    {
+                        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                        return BadRequest(new { Errors = errors });
+                    }
+                }
+                // Generate a JWT token
+                var token = _jwtService.GenerateToken(user);
+                return Ok(new { Token = token });
+            }
+            catch (InvalidJwtException)
+            {
+                // The token is invalid
+                return Unauthorized(new { Error = "Invalid Google token." });
+            }
         }
     }
 }
