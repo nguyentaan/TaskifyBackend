@@ -17,8 +17,8 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<JwtServices>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<TaskReminderService>();
-//builder.Services.AddHostedService<TaskReminderService>();
+//builder.Services.AddScoped<TaskReminderService>();
+builder.Services.AddHostedService<TaskReminderService>();
 
 
 builder.Services.AddAuthentication(options =>
