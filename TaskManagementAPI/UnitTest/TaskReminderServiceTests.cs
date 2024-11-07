@@ -54,7 +54,7 @@ namespace TaskManagementAPI.UnitTest
             serviceProviderMock.Setup(x => x.GetService(typeof(IEmailService)))
                 .Returns(emailServiceMock.Object);
 
-            var taskReminderService = new TaskReminderService(new ApplicationDbContext(_options), scopeFactoryMock.Object);
+            var taskReminderService = new TaskReminderService(scopeFactoryMock.Object);
 
             // Act
             await taskReminderService.TriggerCheckForUpcomingTasks();

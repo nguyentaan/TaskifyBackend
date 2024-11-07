@@ -6,7 +6,7 @@ namespace TaskManagementAPI.Services
     public class TaskReminderService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
-        public TaskReminderService(ApplicationDbContext @object, IServiceScopeFactory scopeFactory)
+        public TaskReminderService(IServiceScopeFactory scopeFactory)
         {
             _scopeFactory = scopeFactory;
         }
